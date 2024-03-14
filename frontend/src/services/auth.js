@@ -51,6 +51,8 @@ const newPassword = (data) => {
 
 const logout = () => {
   TokenService.removeUser();
+  const request = api.post("/logout/", {});
+  return request.then((response) => response.data);
 };
 
 const getCurrentUser = () => {

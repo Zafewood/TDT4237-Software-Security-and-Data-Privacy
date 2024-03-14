@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import viewsets, status, generics
 from apps.users.serializers import UserSerializer, RegisterSerializer, ResetPasswordSerializer, LoginSerializer, SendNewEmailSerializer,  SetNewPasswordSerializer, AssignTeamSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.response import Response
@@ -207,3 +207,13 @@ class SetNewPasswordView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
+
+class LogoutView(TokenBlacklistView):
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Successfully logged out"}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
