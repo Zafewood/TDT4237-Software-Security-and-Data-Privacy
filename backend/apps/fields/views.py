@@ -46,16 +46,10 @@ class FieldBookingsView(APIView):
         start_time = local_date_obj
         end_time = start_time + timedelta(days=1)
 
-        # Unsafe and vulnerable SQL query
-        raw_query = f"SELECT * FROM fields_booking WHERE field_id = {field_id} AND '{start_time}' <= end_time AND '{end_time}' >= start_time"
-
-        bookings = Booking.objects.raw(raw_query)
-
+        bookings = Booking.objects.filter(field_id=field_id, start_time=start_time, end_time=end_time)
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)
-
-
-
+    
 class CurrentFieldsView(APIView):
     """
     API endpoint that returns all fields that are currently in use.
