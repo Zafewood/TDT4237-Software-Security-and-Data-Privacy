@@ -108,6 +108,8 @@ class VerificationView(generics.GenericAPIView):
         try:
             username = urlsafe_base64_decode(uid).decode()
             user = get_user_model().objects.filter(username=username).first()
+            if (datetime.now(timezone.utc) - user.verify_email_timer).seconds > 600:
+                return redirect(invalid_url)
             user.is_active = True
             user.save()
             return redirect(verified_url)
