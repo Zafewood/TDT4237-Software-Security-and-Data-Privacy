@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'apps.consent_requests',
     'apps.fields',
     'apps.objections',
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -98,7 +99,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'safeplay.urls'
@@ -167,7 +169,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 PASSWORD_RESET_TIMEOUT = 3600  # Token valid for one hour
 
 PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher",
 ]
 
 REST_FRAMEWORK = {
@@ -180,9 +184,19 @@ REST_FRAMEWORK = {
     )
 }
 
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+
+    # # Django ModelBackend is the default authentication backend.
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(minutes=10)  # Block for 10 minutes after 5 failed attempts
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60000),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=70),
     'ROTATE_REFRESH_TOKENS': True,
-}
+    'BLACKLIST_AFTER_ROTATION': True,
+    }

@@ -14,7 +14,7 @@ urlpatterns = [
     *router.urls,
     path("api/verify-email/<uid>",
          views.VerificationView.as_view(), name="verify-email"),
-    path('api/logout/', TokenBlacklistView.as_view(),
+    path('api/logout/', views.TokenBlacklistView.as_view(),
          name='logout'),
     path('api/reset-password/<uidb64>/<token>/',
          views.ResetPasswordView.as_view(), name='password-reset'),
